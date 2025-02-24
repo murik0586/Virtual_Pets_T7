@@ -44,3 +44,4 @@ class Dog(Pet):
         def voice(self): return "Гав-Гав"
 
         def walk(self): return "Топ-Топ"
+
