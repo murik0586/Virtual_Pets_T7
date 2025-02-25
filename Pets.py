@@ -1,15 +1,16 @@
 import abc
 
+##todo сделать разбор(Задача для тимлида) .
 class Pet(abc.ABC):
-    _eat = ""
-    _drink = ""
-    _voice = ""
-    _thirst = 0.0
-    _health = 0
-    _hunger = 0.0
+    _eat = "" #
+    _drink = "" #
+    _voice = "" #
+    _thirst = 0.0 #
+    _health = 0 # очки здоровья
+    _hunger = 0.0 #
 
-    def __init__(self, _eat, _drink, _thirst, _health, _hunger):
-        self._eat = _eat
+    def __init__(self, _eat, _drink, _thirst, _health, _hunger): #Конструктор
+        self._eat = _eat #Инициализация полей (в некоторых яп называют переменными)
         self._drink = _drink
         self._thirst = _thirst
         self._health = _health
