@@ -37,12 +37,13 @@ class Cat(Pet):
         super().__init__(_eat, _drink, _thirst, _health, _hunger)
         self._voice = "Мяу-Мяу"
 
-        def walk(self): return "Топ-Топ"
+    def walk(self): return "Топ-Топ"
 
 class Dog(Pet):
+
     def __init__(self, _eat, _drink, _thirst, _health, _hunger):
         super().__init__(_eat, _drink, _thirst, _health, _hunger)
         self._voice = "Гав-Гав"
 
-        def walk(self): return "Топ-Топ"
+    def walk(self): return "Топ-Топ"
 
