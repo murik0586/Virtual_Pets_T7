@@ -1,48 +1,62 @@
 import abc
 
 class Pet(abc.ABC):
-    _eat = "" # Звук еды (Заглушка для тестирования, переделаем на анимации)
-    _drink = "" # Звук питья (Заглушка для тестирования, переделаем на анимации)
-    _voice = "" # Голос животного
-    _thirst = 0.0 # Жажда
-    _health = 0 # Очки здоровья
-    _hunger = 0.0 # Голод
-
-    def __init__(self, _eat, _drink, _thirst, _health, _hunger): #Конструктор
-        self._eat = _eat #Инициализация полей (в некоторых яп называют переменными)
-        self._drink = _drink
-        self._thirst = _thirst
-        self._health = _health
-        self._hunger = _hunger
+    # Инициализация полей (в некоторых яп называют переменными)
+    def __init__(self, eat : str, drink : str, thirst : float, health : int, hunger : float, voice : str): #Конструктор
+        self.__eat = eat # Звук еды (Заглушка для тестирования, переделаем на анимации)
+        self.__drink = drink # Звук питья (Заглушка для тестирования, переделаем на анимации)
+        self.__thirst = thirst # Жажда
+        self.__health = health # Очки здоровья
+        self.__hunger = hunger # Голод
+        self.__voice = voice # Голос животного
 
     @abc.abstractmethod
-    def eat(self):
-        print(self._eat)
-        self._hunger = 0
+    def get_eat(self):
+        print(self.__eat)
+        self.__hunger = 0
         return
 
     @abc.abstractmethod
-    def drink(self):
-        print(self._drink)
-        self._thirst = 0
+    def set_eat(self, eat : str):
+        self.__eat = eat
         return
 
     @abc.abstractmethod
-    def voice(self):
-        print(self._voice)
+    def get_drink(self):
+        print(self.__drink)
+        self.__thirst = 0
+        return
+
+    @abc.abstractmethod
+    def set_drink(self, drink : str):
+        self.__drink = drink
+        return
+
+    @abc.abstractmethod
+    def get_voice(self):
+        print(self.__voice)
+        return
+
+    @abc.abstractmethod
+    def set_voice(self, voice : str):
+        self.__voice = voice
         return
 
 class Cat(Pet):
-    def __init__(self, _eat, _drink, _thirst, _health, _hunger):
-        super().__init__(_eat, _drink, _thirst, _health, _hunger)
-        self._voice = "Мяу-Мяу"
+    def __init__(self, eat, drink, thirst, health, hunger):
+        super().__init__(eat, drink, thirst, health, hunger)
+        self.__voice = "Мяу-Мяу"
 
-    def walk(self): return "Топ-Топ"
+    def get_walk(self): return "Топ-Топ"
+
+    def set_walk(self): return
 
 class Dog(Pet):
-    def __init__(self, _eat, _drink, _thirst, _health, _hunger):
-        super().__init__(_eat, _drink, _thirst, _health, _hunger)
-        self._voice = "Гав-Гав"
+    def __init__(self, eat, drink, thirst, health, hunger):
+        super().__init__(eat, drink, thirst, health, hunger)
+        self.__voice = "Гав-Гав"
 
-    def walk(self): return "Топ-Топ"
+    def get_walk(self): return "Топ-Топ"
+
+    def set_walk(self): return
 
