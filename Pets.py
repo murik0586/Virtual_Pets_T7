@@ -4,8 +4,8 @@ class Pet(abc.ABC):
 
     # Инициализация полей (в некоторых яп называют переменными)
     def __init__(self, eat : str, drink : str, thirst : float, health : int, hunger : float, voice : str): #Конструктор
-        self.__eat = eat # Звук еды (Заглушка для тестирования, переделаем на анимации)
-        self.__drink = drink # Звук питья (Заглушка для тестирования, переделаем на анимации)
+        self.__eat = eat # Звук еды (Заглушка для тестирования
+        self.__drink = drink # Звук питья (Заглушка для тестирования)
         self.__thirst = thirst # Жажда
         self.__health = health # Очки здоровья
         self.__hunger = hunger # Голод
