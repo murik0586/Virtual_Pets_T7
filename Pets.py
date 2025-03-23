@@ -26,9 +26,7 @@ class Pet(abc.ABC):
 
 
     def get_drink(self):
-        print(self.__drink)
-        self.__thirst = 0
-        return
+        return self.__drink
 
 
     def set_drink(self, drink : str):
@@ -38,8 +36,7 @@ class Pet(abc.ABC):
 
     def get_voice(self):
         """difdsfasf"""
-        print(self.__voice)
-        return
+        return self.__voice
 
 
     def set_voice(self, voice : str):
