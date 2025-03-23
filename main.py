@@ -1,4 +1,5 @@
-import Pets
+from entity import Pets
+
 # This is a sample Python script.
 
 # Press Shift+F10 to execute it or replace it with your code.
@@ -7,7 +8,7 @@ import Pets
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-pets = Pets.Cat('1', '2', 3, 4, 5,"sfsaf")
+pets = Pets.Cat('1', '2', 3, 4, 5, "sfsaf")
 help(pets.get_eat)
 print(pets.get_eat())
 pets.set_eat("10")
