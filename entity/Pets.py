@@ -12,7 +12,7 @@ class Pets(abc.ABC):
         :param points_health: Очки здоровья
         :param happiness_indicator: Уровень счастья(по умолчанию 2)
         :param hunger_level: Уровень голода(по умолчанию 2)
-        :param  voice: Голос питомца
+        :param voice: Голос питомца
         """
         self.__nickname = nickname  # кличка
         self.__thirst = thirst  # Жажда
@@ -96,3 +96,46 @@ class Pets(abc.ABC):
             print(f"Критичный уровень голода! - 1hp, здоровье питомца {hunger_level - 1}")
             return
         self.__hunger_level = hunger_level
+
+    # Методы абстрактные
+    # TODO определимся в дальнейшем: нам создать пользователя и который будет иметь свои методы
+    #  а у животного будут методы "пить, есть и т.д которые вызываются в методах юзера"
+    #  или же оставим их тут, щас я не думаю что это критично,
+    # todo конечно же это может отличаться у каждого животного
+
+    @abc.abstractmethod
+    def give_water(self):
+        """Абстрактный метод: напоить питомца
+        Если напоить - 2 """
+        pass
+
+    @abc.abstractmethod
+    def feed(self):
+
+        """Абстрактный метод: покормить питомца.
+        -2 к голоду + 1 к жажде"""
+        pass
+
+    @abc.abstractmethod
+    def pet(self):
+        """Абстрактный метод: погладить питомца.
+        + 1 к счастью, +1 к голоду"""
+        pass
+
+    @abc.abstractmethod
+    def give_treat(self):
+        """Абстрактный метод: дать вкусняшку питомцу.
+        +2 к счастью,- 1 к голоду"""
+        pass
+
+    @abc.abstractmethod
+    def walk(self):
+        """Абстрактный метод: погулять с питомцем.
+        + 1 к счастью, + 3 к голоду +2 к жажде"""
+        pass
+
+    @abc.abstractmethod
+    def ignore(self):
+        """Абстрактный метод: игнорировать питомца.
+        -1 к счастью, + 1 к голоду"""
+        pass
