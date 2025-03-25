@@ -1,39 +1,98 @@
 import abc
 
 
-class Pet(abc.ABC):
-    _minHP = 0
-    def __init__(self, eat: str, drink: str, thirst: float, health: int, hunger: float, voice: str):  # Конструктор
-        self.__eat = eat  # Звук еды (Заглушка для тестирования
-        self.__drink = drink  # Звук питья (Заглушка для тестирования)
+class Pets(abc.ABC):
+    ##todo ДЛЯ ВСЕХ, я добавлю описание всего что я сделал, в случае несостыковки логики - дайте знать, исправлю!
+
+    def __init__(self, nickname: str, points_health: int, voice: str, happiness_indicator: int = 2,
+                 hunger_level: int = 2, thirst: int = 2, ):  # Конструктор
+        """Инициализирует питомца.
+        :param nickname: Кличка питомца
+        :param thirst: Уровень жажды(0 - 20)
+        :param points_health: Очки здоровья
+        :param happiness_indicator: Уровень счастья(по умолчанию 2)
+        :param hunger_level: Уровень голода(по умолчанию 2)
+        :param  voice: Голос питомца
+        """
+        self.__nickname = nickname  # кличка
         self.__thirst = thirst  # Жажда
-        self.__health = health  # Очки здоровья
-        self.__hunger = hunger  # Голод
+        self.__points_health = points_health  # Очки здоровья
+        #todo по заданию, задается при создании, но если сделать большое кол очков
+        # то получиться так, что тестить долго в первое время, потому, максимальное значение хп
+        # будет зависеть от животного
+        self.__happiness_indicator = happiness_indicator
+        self.__hunger_level = hunger_level  # Голод
         self.__voice = voice  # Голос животного
 
-    def get_eat(self):
-        """
-        Порвывавы
-        """
+    ##Геттеры Мурат
+    @property
+    def nickname(self):
+        return self.__nickname
 
-        return self.__eat
+    @property
+    def thirst(self):
+        return self.__thirst
 
-    def set_eat(self, eat: str):
-        self.__eat = eat
-        return
+    @property
+    def points_health(self):
+        return self.__points_health
 
-    def get_drink(self):
-        return self.__drink
+    @property
+    def happiness_indicator(self):
+        return self.__happiness_indicator
 
-    def set_drink(self, drink: str):
-        self.__drink = drink
-        return
+    @property
+    def hunger_level(self):
+        return self.__hunger_level
 
-    def get_voice(self):
-        """difdsfasf"""
+    @property
+    def voice(self):
         return self.__voice
 
-    def set_voice(self, voice: str):
-        self.__voice = voice
-        return
+    ##Сеттеры Мурат
+    @nickname.setter
+    def nickname(self, nickname: str):
+        if len(nickname) <= 2:
+            print("Никнейм(Кличка) должен быть от двух символов")
+            return
 
+        else:
+            self.__nickname = nickname
+
+    @thirst.setter
+    def thirst(self, thirst: int):
+        if thirst > 20:
+            print("Стоп! Это критический уровень жажды!")
+            return
+        elif thirst < 0:
+            print("Обойдемся только положительными числами!")
+            return
+        self.__thirst = thirst
+
+    @points_health.setter
+    def points_health(self, points_health: int):
+        if points_health <= 0:
+            print("Обойдемся только положительными числами и больше 0!")
+            return
+        self.__points_health = points_health
+
+    @happiness_indicator.setter
+    def happiness_indicator(self, happiness_indicator: int):
+        if happiness_indicator <= 0:
+            print("Обойдемся только положительными числами и больше 0!")
+            return
+        elif happiness_indicator > 20:
+            print("Максимальный уровень счастья достигнут!")
+            return
+        self.__happiness_indicator = happiness_indicator
+
+    @hunger_level.setter
+    def hunger_level(self, hunger_level: int):
+        if hunger_level <= 0:
+            print("Обойдемся только положительными числами и больше 0!")
+            return
+        elif hunger_level > 5:
+            self.__hunger_level -= 1
+            print(f"Критичный уровень голода! - 1hp, здоровье питомца {hunger_level - 1}")
+            return
+        self.__hunger_level = hunger_level
