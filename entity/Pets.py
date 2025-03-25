@@ -94,6 +94,8 @@ class Pets(abc.ABC):
             print("Обойдемся только положительными числами и больше 0!")
             return
         elif hunger_level > 5:
+            self.__points_health -= 1
+            self.__hunger_level = hunger_level
             points_health = self.__points_health - 1  # Уменьшаем хп
             print(f"Критичный уровень голода! - 1hp, здоровье питомца {points_health}")
             return
