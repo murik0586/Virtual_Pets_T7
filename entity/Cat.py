@@ -1,11 +1,39 @@
 from entity.Pets import Pets
 
-#todo доделать
+
+# todo доделать
 class Cat(Pets):
-    def __init__(self, eat, drink, thirst, points_health, hunger_level, voice):
-        super().__init__(eat, drink, thirst, points_health, hunger_level, voice)
-        self.__voice = "Мяу-Мяу"
 
-    def get_walk(self): return "Топ-Топ"
+    def __init__(self, nickname: str, breed: str, points_health: int, voice: str = "Мяу-мяу",
+                 happiness_indicator: int = 2, hunger_level: int = 2, thirst: int = 2):
+        super().__init__(nickname, points_health, voice, happiness_indicator, hunger_level, thirst)
+        self.__breed = breed
 
-    def set_walk(self): return
+
+    def give_water(self):
+        # todo Елизар
+        pass
+
+    def feed(self):
+        # todo Игорь
+        pass
+
+    def pet(self):
+        # todo Мурат
+        pass
+
+    def give_treat(self):
+        # todo Игорь
+        pass
+
+    def walk(self):
+        # todo Елизар
+        pass
+
+    def ignore(self):
+        #todo Дарья
+        pass
+
+
+    def __str__(self):
+        return super().__str__() + f"\nПорода:{self.__breed} "
