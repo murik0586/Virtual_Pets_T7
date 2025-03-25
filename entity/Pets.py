@@ -145,9 +145,10 @@ class Pets(abc.ABC):
         pass
 
     def __str__(self):
-            return (f"{self.type_of_pet}: {self.__nickname}: \n"
-                f"❤️Здоровье: {self.__points_health}: \n"
-                f"😊Счастье: {self.__happiness_indicator}: \n"
-                f"🍗Голод: {self.__hunger_level}: \n"
-                f"💧Жажда: {self.thirst}: \n"
-                f"🔊Голос: {self.__voice}")
+            return (f"{self.type_of_pet}: \n"
+                    f"Кличка: {self.__nickname}\n"
+                    f"❤️Здоровье: {self.__points_health}:\n"
+                    f"😊Cчастье: {self.__happiness_indicator}:\n"
+                    f"🍗Голод: {self.__hunger_level}:\n"
+                    f"💧 Жажда: {self.thirst}:\n"
+                    f"🔊Голос: {self.__voice}")
