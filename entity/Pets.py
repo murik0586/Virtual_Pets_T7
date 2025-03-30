@@ -23,7 +23,9 @@ class Pets(abc.ABC):
         # будет зависеть от животного
         self.__happiness_indicator = happiness_indicator
         self.__hunger_level = hunger_level  # Голод
+        self.__hunger_penalty = 1  # Переменная для хранения штрафа за отнимание жизней
         self.__voice = voice  # Голос животного
+        self.__life = True # Жизнь питомца
 
     ##Геттеры Мурат
     @property  # Это сигнатура для геттера!
@@ -72,10 +74,12 @@ class Pets(abc.ABC):
 
     @points_health.setter
     def points_health(self, points_health: int):
-        if points_health <= 0:  # не даем установить здоровье меньше нуля или 0(по логике тогда питомец должен исчезнуть)
+        if points_health < 0:  # не даем установить здоровье меньше нуля или 0(по логике тогда питомец должен исчезнуть)
+            points_health = 0
             print("Обойдемся только положительными числами и больше 0!")
-            return
         self.__points_health = points_health
+        if points_health <= 0:
+            print("Питомец умер от голода! 💀")
 
     @happiness_indicator.setter
     def happiness_indicator(self, happiness_indicator: int):
@@ -94,12 +98,15 @@ class Pets(abc.ABC):
             print("Обойдемся только положительными числами и больше 0!")
             return
         elif hunger_level > 5:
-            self.__points_health -= 1
+            self.__points_health -= self.__hunger_penalty  # Отнимаем текущий штраф
             self.__hunger_level = hunger_level
-            points_health = self.__points_health - 1  # Уменьшаем хп
-            print(f"Критичный уровень голода! - 1hp, здоровье питомца {points_health}")
-            return
-        self.__hunger_level = hunger_level
+            #points_health = self.__points_health - 1  Не нужно т.к. уже отняли
+            print(f"Критичный уровень голода! -{self.__hunger_penalty}hp, здоровье: {self.__points_health}")
+            self.__hunger_penalty += 1  # Увеличиваем штраф для следующего раза
+        else:
+            self.__hunger_penalty = 1 # Если голод <= 5 — сбрасываем штраф (питомец поел)
+            #return
+        self.__hunger_level = hunger_level #Назначение в любом случае кроме того когда hunger_level <= 0
 
     # Методы абстрактные
     # TODO определимся в дальнейшем: нам создать пользователя и который будет иметь свои методы
@@ -110,16 +117,17 @@ class Pets(abc.ABC):
 
     @abc.abstractmethod
     def give_water(self):
-        """Абстрактный метод: напоить питомца
-        Если напоить (- 2) """
-        pass
+        """Уменьшает уровень жажды на 2, но не ниже 0."""
+        self.thirst = max(0, self.thirst - 2) # Берет максимальное значение
 
     @abc.abstractmethod
     def feed(self):
         # todo Игорь
         """Абстрактный метод: покормить питомца.
         -2 к голоду + 1 к жажде"""
-        pass
+        self.hunger_level = max(0, self.hunger_level - 2)
+        self.thirst += 1
+
 
     @abc.abstractmethod
     def pet(self):
@@ -129,10 +137,10 @@ class Pets(abc.ABC):
 
     @abc.abstractmethod
     def give_treat(self):
-
         """Абстрактный метод: дать вкусняшку питомцу.
         +2 к счастью,- 1 к голоду"""
-        pass
+        self.happiness_indicator += 2
+        self.hunger_level = max(0, self.hunger_level - 1)
 
     @abc.abstractmethod
     def walk(self):
