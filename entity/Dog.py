@@ -1,7 +1,7 @@
-from entity.Pets import Pets
+from entity.Pet import Pet
 
 
-class Dog(Pets):
+class Dog(Pet):
     type_of_pet = "Собака" #Это поле для красивого отображения в __str__ - стр это аналог toString() из java
     def __init__(self, nickname: str, breed: str, points_health: int, voice: str = "Гав-гав",
                  happiness_indicator: int = 2, hunger_level: int = 2, thirst: int = 2):

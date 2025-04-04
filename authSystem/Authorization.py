@@ -1,6 +1,5 @@
-from entity.Cat import Cat
-from entity.Dog import Dog
-from entity.Pets import Pets
+from entity.Pet import Pet
+from entity.PetFactory import PetFactory
 
 class Authorization():
     def __init__(self, login : str, password : str):    #todo Заготовка под авторизацию, надо будет добавить сюда, вместо self.login/password = login/password, поиск логина и пароля в БД и выдавать ошибку если этих данных там нет.
@@ -16,18 +15,18 @@ class Authorization():
             raise ValueError("Кличка животного не может быть пустой.")
 
         if pet.lower() == "cat":
-            cat = Cat(nickname, breed,30)
+            cat = PetFactory.create_pet('cat')
             return cat
         elif pet.lower() == "dog":
-            dog = Dog(nickname, breed,30)
+            dog = PetFactory.create_pet('dog')
             return dog
         else:
             raise ValueError("Не существует такого вида домашнего питомца.")
 
-    def remove_pet(self, pet: Pets): #todo После добавления БД надо будет дописать функцию.
+    def remove_pet(self, pet: Pet): #todo После добавления БД надо будет дописать функцию.
         return f"Домашний питомец {pet.nickname} удален"
 
-    def change_pet_nickname(self, pet: Pets, new_nickname : str):
+    def change_pet_nickname(self, pet: Pet, new_nickname : str):
         if new_nickname != "":
             pet.nickname = new_nickname
         else:

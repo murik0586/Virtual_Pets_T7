@@ -1,7 +1,6 @@
 import abc
 
-
-class Pets(abc.ABC):
+class Pet(abc.ABC):
     ##todo ДЛЯ ВСЕХ, я добавлю описание всего что я сделал, в случае несостыковки логики - дайте знать, исправлю!
     type_of_pet = "Питомец" #Это поле для красивого отображения в __str__ - стр это аналог toString() из java
     def __init__(self, nickname: str, points_health: int, voice: str = "Это абстрактный класс",
