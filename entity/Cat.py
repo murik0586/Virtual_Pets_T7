@@ -36,8 +36,17 @@ class Cat(Pet):
         pass
 
     def walk(self):
-        # todo Елизар
-        pass
+        """Погулять с котом.
+        +1 к счастью, +3 к голоду, +2 к жажде"""
+        print(f"{self.nickname} идет на прогулку!")
+        self.happiness_indicator += 1
+        self.hunger_level += 3
+        self.thirst += 2
+    
+        # Проверка на исчезновение питомца
+        if self.happiness_indicator <= 0 or self.points_health <= 0:
+            print(f"{self.nickname} исчез! ")
+            self.__life = False
 
     def ignore(self):
         #todo Дарья
