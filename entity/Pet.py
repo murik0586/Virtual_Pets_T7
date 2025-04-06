@@ -50,6 +50,11 @@ class Pet(abc.ABC):
     @property
     def voice(self):
         return self.__voice
+    
+    @property
+    def life(self):
+        """Возвращает статус жизни питомца (True/False)."""
+        return self.__life
 
     ##Сеттеры Мурат
     @nickname.setter  # Сигнатура для сеттера
