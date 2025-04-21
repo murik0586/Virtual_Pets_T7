@@ -18,3 +18,5 @@ def test_thirst_setter_min_value():
     expected_thirst = 2
     cat.thirst = -1
     assert expected_thirst == cat.thirst
+
+    ### some
