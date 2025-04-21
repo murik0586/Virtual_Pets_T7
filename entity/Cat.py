@@ -4,7 +4,7 @@ from entity.Pet import Pet
 # todo доделать
 class Cat(Pet):
     type_of_pet = "Кот" #Это поле для красивого отображения в __str__ - стр это аналог toString() из java
-    def __init__(self, nickname: str, breed: str, points_health: int, voice: str = "Мяу-мяу",
+    def __init__(self, nickname: str, breed: str, points_health: int = 10, voice: str = "Мяу-мяу",
                  happiness_indicator: int = 2, hunger_level: int = 2, thirst: int = 2):
         """Инициализирует Кота.
              :param nickname: Кличка Кота
