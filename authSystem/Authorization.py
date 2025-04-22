@@ -24,10 +24,10 @@ class Authorization():
             raise ValueError("Не существует такого вида домашнего питомца.")
 
     def remove_pet(self, pet: Pet): #todo После добавления БД надо будет дописать функцию.
-        return f"Домашний питомец {pet.nickname} удален"
+        return f"Домашний питомец {pet.name} удален"
 
-    def change_pet_nickname(self, pet: Pet, new_nickname : str):
-        if new_nickname != "":
-            pet.nickname = new_nickname
+    def change_pet_name(self, pet: Pet, name : str):
+        if name != "":
+            pet.name = name
         else:
             raise ValueError("Кличка животного не может быть пустой.")
