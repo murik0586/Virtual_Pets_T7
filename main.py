@@ -1,15 +1,7 @@
-from entity.Pet import Pet
+from entity.PetManager import PetManager
+from UI.ConsoleUI import ConsoleUI
 
-pet = Pet("JoJo", 10)
-print(pet)
-
-pet.walk()
-print(pet)
-pet.walk()
-print(pet)
-pet.walk()
-print(pet)
-pet.walk()
-print(pet)
-pet.walk()
-print(pet)
+if __name__ == "__main__":
+    manager = PetManager()
+    ui = ConsoleUI(manager)
+    ui.run()
