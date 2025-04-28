@@ -1,5 +1,6 @@
 from entity.PetManager import PetManager
 from UI.PetInteractionUI import PetInteractionUI
+import time
 
 class ConsoleUI:
     def __init__(self, manager: PetManager):
@@ -35,7 +36,7 @@ class ConsoleUI:
 
     def _create_pet(self):
         name = input("Введите имя питомца: ").strip()
-        health = int(input("Введите здоровье (по умолчанию 5): ") or 5)
+        health = int(input("Введите здоровье: ") or 5)
         pet_id = self._manager.create_pet(name, health)
         print(f"Создан питомец {name} с ID {pet_id}")
 
