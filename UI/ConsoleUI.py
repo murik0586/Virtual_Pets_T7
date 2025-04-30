@@ -1,5 +1,6 @@
 from entity.PetManager import PetManager
 from UI.PetInteractionUI import PetInteractionUI
+import time
 
 class ConsoleUI:
     def __init__(self, manager: PetManager):
@@ -35,7 +36,11 @@ class ConsoleUI:
 
     def _create_pet(self):
         name = input("Введите имя питомца: ").strip()
-        health = int(input("Введите здоровье (по умолчанию 5): ") or 5)
+        try:
+            health = int(input("Введите здоровье: ") or 5) #Я добавлю ребят чутка валидации!
+        except ValueError:
+            print("Нужно вводить число! Установлено значение по умолчанию (т.е. 5)")
+            health = 5
         pet_id = self._manager.create_pet(name, health)
         print(f"Создан питомец {name} с ID {pet_id}")
 
@@ -48,14 +53,14 @@ class ConsoleUI:
         pets = self._manager.pets
         if not pets:
             print("Нет доступных питомцев!")
-            return None
+            return None, None #Внес изменения
 
         print("\nСписок питомцев:")
         for id_, pet in pets.items():
             print(f"ID {id_}: {pet.name}")
 
         pet_id = int(input("Введите ID питомца: "))
-        return self._manager.get_pet(pet_id)
+        return pet_id, self._manager.get_pet(pet_id) # здесь еще внес, кажется с id не лады были(влияло на функцию delete)
 
     def _show_all_pets(self):
         for id_, pet in self._manager.pets.items():
@@ -63,6 +68,6 @@ class ConsoleUI:
             print(pet)
 
     def _delete_pet(self):
-        pet = self._select_pet()
-        if pet and self._manager.remove_pet(id(pet)):
+        pet_id,pet = self._select_pet() #раз ты тут, id у тебя было объекта, а не питомца)
+        if pet and self._manager.remove_pet(id(pet_id)):
             print(f"Питомец {pet.name} удален")
