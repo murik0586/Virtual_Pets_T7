@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: Tamagotchi API
+  description: API для управления виртуальными питомцами
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Локальный сервер
+
+paths:
+  /pets:
+    get:
+      summary: Получить список живых питомцев
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+    post:
+      summary: Создать нового питомца
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPet'
+      responses:
+        '201':
+          description: Питомец создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: ID созданного питомца
+
+  /pets/{petId}:
+    get:
+      summary: Получить информацию о питомце
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '404':
+          description: Питомец не найден
+    delete:
+      summary: Удалить питомца
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Питомец удален
+        '404':
+          description: Питомец не найден
+
+  /pets/{petId}/{action}:
+    post:
+      summary: Выполнить действие с питомцем
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [feed, stroke, treat, walk, ignore]
+      responses:
+        '200':
+          description: Действие выполнено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Неверное действие или питомец мертв
+        '404':
+          description: Питомец не найден
+
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        health:
+          type: integer
+        happiness:
+          type: integer
+        hunger:
+          type: integer
+        is_alive:
+          type: boolean
+    NewPet:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 3
+        health:
+          type: integer
+          minimum: 1
+          default: 5
