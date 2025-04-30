@@ -68,3 +68,31 @@ def test_happiness_setter_max_value_is_alive_false(pet):
 #<editor-fold desc="Test hungry>
 
 # </editor-fold>
+
+#<editor-fold desc="Test hunger">
+#TODO
+def test_hunger_setter_normal_value(pet):
+    """Голод корректно устанавливается в допустимом диапазоне"""
+    expected_hunger = 5
+    pet.state.hunger = expected_hunger
+    assert expected_hunger == pet.state.hunger
+
+def test_hunger_setter_max_value(pet):
+    """Голод не должен превышать максимум"""
+    expected_hunger = 10
+    pet.state.hunger = 15
+    assert expected_hunger == pet.state.hunger
+
+def test_hunger_setter_min_value(pet):
+    """Голод не должен быть меньше нуля"""
+    expected_hunger = 0
+    pet.state.hunger = -5
+
+    assert expected_hunger == pet.state.hunger
+
+def test_hunger_setter_zero_value_is_alive_false(pet):
+    """Питомец должен умереть при критическом голоде"""
+    pet.state.hunger = 0
+    assert not pet.state.is_alive
+
+# </editor-fold>

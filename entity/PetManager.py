@@ -1,4 +1,5 @@
 from entity.Pet import Pet
+from typing import Optional
 
 class PetManager:
     def __init__(self):
@@ -16,7 +17,7 @@ class PetManager:
         self._next_id += 1
         return pet_id
 
-    def get_pet(self, pet_id: int):
+    def get_pet(self, pet_id: int) -> Optional[Pet]:
         return self._pets.get(pet_id)
 
     def remove_pet(self, pet_id: int) -> bool:

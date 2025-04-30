@@ -12,14 +12,19 @@ class PetInteractionUI:
             match choice:
                 case "1":
                     self._pet.feed()
+                    print("Ты покормил питомца")
                 case "2":
                     self._pet.stroke()
+                    print("Ты погладил питомца")
                 case "3":
                     self._pet.give_treat()
+                    print("Ты дал вкусняшку питомцу")
                 case "4":
                     self._pet.walk()
+                    print("Ты погулял с питомцем, а он у тебя с поводком?")
                 case "5":
                     self._pet.ignore()
+                    print("Ты конечно проигнорировал питомца, ну ты че!")
                 case "0":
                     return
                 case _:
