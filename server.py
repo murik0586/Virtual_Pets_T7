@@ -4,7 +4,7 @@ import urllib.parse
 from datetime import datetime
 import logging
 
-# Настройка логгирования
+# Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(message)s',
