@@ -23,8 +23,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest
-        # если у тебя есть файл зависимостей:
-        # pip install -r requirements.txt
+
 
     - name: Run tests
       run: |
