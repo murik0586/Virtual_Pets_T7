@@ -21,10 +21,17 @@ pet_manager = PetManager()
 
 
 class TamagotchiRequestHandler(BaseHTTPRequestHandler):
+    def _set_cors_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+
     def _set_headers(self, status_code=200, content_type='application/json'):
         self.send_response(status_code)
         self.send_header('Content-type', content_type)
+        self._set_cors_headers()  # CORS-заголовки
         self.end_headers()
+
 
     def _parse_url(self):
         path = urllib.parse.urlparse(self.path).path
@@ -55,6 +62,11 @@ class TamagotchiRequestHandler(BaseHTTPRequestHandler):
     def _log_request(self):
         logger.info(f"{self.client_address[0]} - {self.command} {self.path}")
 
+    def do_OPTIONS(self):
+        """Обработка CORS preflight запросов"""
+        self._log_request()
+        self._set_headers(204)  # No Content для OPTIONS
+        self.end_headers()
 
     def do_GET(self):
         self._log_request()
