@@ -7,11 +7,11 @@ class MongoDBClient:
 
     '''Добавление данных в таблицу БД.
     table_name - Наименование таблицы,
-    data - Набор данных.'''
-    def insert_one(self, table_name, data):
+    document - Набор данных.'''
+    def insert_one(self, table_name, document):
         table = self.db[table_name]
 
-        return  table.insert_one(data)
+        return  table.insert_one(document)
 
     '''Получение всех данных из таблицы БД.
     table_name - Наименование таблицы.'''
