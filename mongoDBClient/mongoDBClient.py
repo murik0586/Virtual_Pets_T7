@@ -5,9 +5,15 @@ from authSystem.Hash_token import Hash_token
 
 
 class MongoDBClient:
-    def __init__(self, uri : str, db_name : str):
-        self.client = MongoClient(uri) #Создание подключения.
-        self.db = self.client[db_name] #Поиск и выбор нужной БД.
+    def __init__(self, uri: str, db_name: str, username: str = None, password: str = None):
+        if username and password:
+            # Правильный формат URI с аутентификацией
+            self.client = MongoClient(
+                f"mongodb://{username}:{password}@localhost:27017/{db_name}?authSource=admin"
+            )
+        else:
+            self.client = MongoClient(uri)
+        self.db = self.client[db_name]
 
     '''Добавление данных в коллекцию БД.
     collection_name - Наименование коллекции,
@@ -18,11 +24,12 @@ class MongoDBClient:
         return  collection.insert_one(document)
 
     '''Получение всех данных из коллекции БД.
-    collection_name - Наименование коллекции.'''
-    def get_all(self, collection_name : str) -> list:
-        collection = self.db[collection_name]
-
-        return list(collection.find())
+    collection_name - Наименование коллекции.
+    query {dict} - Условие поиска, по умолчанию None'''
+    def get_all(self, collection_name : str, query: dict = None) -> list:
+        if query is None:
+            query = {}
+        return list(self.db[collection_name].find(query))
 
     '''Обновление одной записи, 
     collection_name - Наименование коллекции, 
@@ -34,12 +41,11 @@ class MongoDBClient:
 
     '''Поиск данных по полю field и значению value.
     collection_name - Наименование коллекции,
-    field - Поле,
-    value - Значение.'''
-    def find_by_field(self, collection_name : str, field : str, value):
+    query  {dict} - Условие поиска(например, {"name": "Alice"}'''
+    def find_by_field(self, collection_name : str, query: dict):
         collection = self.db[collection_name]
 
-        return  collection.find_one({field, value})
+        return  collection.find_one(query)
 
     '''Поиск пользователя в БД по логину.
     collection_name - Наименование коллекции,
