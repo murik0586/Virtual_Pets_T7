@@ -12,7 +12,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Импорт ваших классов (должны быть в тех же файлах)
 from entity.Pet import Pet
 from entity.PetState import PetState
 from entity.PetManager import PetManager

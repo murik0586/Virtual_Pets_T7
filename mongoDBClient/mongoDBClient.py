@@ -24,6 +24,14 @@ class MongoDBClient:
 
         return list(collection.find())
 
+    '''Обновление одной записи, 
+    collection_name - Наименование коллекции, 
+    query  {dict} - Условие поиска(например, {"name": "Alice"}),
+    new_values {dict} - Новые значения полей (например, {"age": 31, "status": "active"})'''
+    def update_one(self, collection_name : str, query, new_values):
+        collection = self.db[collection_name]
+        return collection.update_one(query, {"$set": new_values})
+
     '''Поиск данных по полю field и значению value.
     collection_name - Наименование коллекции,
     field - Поле,
