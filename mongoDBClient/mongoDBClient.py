@@ -1,33 +1,56 @@
 from pymongo import MongoClient
+from pymongo.results import InsertOneResult
+
+from authSystem.Hash_token import Hash_token
+
 
 class MongoDBClient:
-    def __init__(self, url, db_name):
-        self.client = MongoClient(url) #Создание подключения.
+    def __init__(self, uri : str, db_name : str):
+        self.client = MongoClient(uri) #Создание подключения.
         self.db = self.client[db_name] #Поиск и выбор нужной БД.
 
-    '''Добавление данных в таблицу БД.
-    table_name - Наименование таблицы,
+    '''Добавление данных в коллекцию БД.
+    collection_name - Наименование коллекции,
     document - Набор данных.'''
-    def insert_one(self, table_name, document):
-        table = self.db[table_name]
+    def insert_one(self, collection_name : str, document) -> InsertOneResult:
+        collection = self.db[collection_name]
 
-        return  table.insert_one(document)
+        return  collection.insert_one(document)
 
-    '''Получение всех данных из таблицы БД.
-    table_name - Наименование таблицы.'''
-    def get_all(self, table_name):
-        table = self.db[table_name]
+    '''Получение всех данных из коллекции БД.
+    collection_name - Наименование коллекции.'''
+    def get_all(self, collection_name : str) -> list:
+        collection = self.db[collection_name]
 
-        return list(table.find())
+        return list(collection.find())
 
     '''Поиск данных по полю field и значению value.
-    table_name - Наименование таблицы,
+    collection_name - Наименование коллекции,
     field - Поле,
     value - Значение.'''
-    def find_by_field(self, table_name, field, value):
-        table = self.db[table_name]
+    def find_by_field(self, collection_name : str, field : str, value):
+        collection = self.db[collection_name]
 
-        return  table.find_one({field, value})
+        return  collection.find_one({field, value})
+
+    '''Поиск пользователя в БД по логину.
+    collection_name - Наименование коллекции,
+    username - логин пользователя'''
+    def find_user(self, collection_name : str, username : str):
+        collection = self.db[collection_name]
+
+        return collection.find_one({"username": username})
+
+    def create_user(self, collection_name : str, username : str, password : str) -> bool:
+        collection = self.db[collection_name]
+        hash_token = Hash_token()
+
+        if collection.find_one({"username": username}):
+            return False #Если уже есть пользователь с таким username, возвращаем False.
+
+        collection.insert_one({"username": username, "password": hash_token.hash_password(password), "userGuid": hash_token.generate_guid()})
+
+        return True
 
     '''Завершение подключения к mongodb.'''
     def close(self):
