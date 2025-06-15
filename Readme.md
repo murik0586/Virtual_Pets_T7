@@ -78,8 +78,8 @@ __________________________________________________________________
 ----------------------------------------------------------------
 ### Разработчики:
 
-+ Мурат Мусаев ([murik0586](https://github.com/murik0586)) - 
-+ Владислав Соколов ([VladislavDevs](https://github.com/VladislavDevs)) - 
-+ Василий Прибылов ([dartmew](https://github.com/dartmew)) -
-+ Игорь Мануйлов ([EntityDarkness](https://github.com/EntityDarkness)) - 
-+ Елизар Заставный ([qu1kk](https://github.com/qu1kk)) - 
++ Мурат Мусаев ([murik0586](https://github.com/murik0586)) 
++ Владислав Соколов ([VladislavDevs](https://github.com/VladislavDevs))
++ Василий Прибылов ([dartmew](https://github.com/dartmew))
++ Игорь Мануйлов ([EntityDarkness](https://github.com/EntityDarkness))
++ Елизар Заставный ([qu1kk](https://github.com/qu1kk))
