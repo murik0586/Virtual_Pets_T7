@@ -1,3 +1,4 @@
+import mongoDBClient.mongoDBClient
 from authSystem.Hash_token import Hash_token
 from mongoDBClient import mongoDBClient
 
@@ -5,25 +6,29 @@ class Authorization:
     def __init__(self, uri : str, db_name : str):
         self.uri = uri
         self.db_name = db_name
+        self.mongo_client = mongoDBClient.MongoDBClient(
+            uri=uri,
+            db_name=db_name,
+            username="admin",
+            password="12345"
+        )
 
         """Инициализирует авторизацию.
         :param login: Логин
         :param password: Пароль
         """
     def authorize(self, username : str, password : str):
-        database = mongoDBClient.MongoDBClient(self.uri, self.db_name)
         hash_token = Hash_token()
 
-        user = database.find_user("Users", username)
+        user = self.mongo_client.find_user("users", username)
         if user and user['password'] == hash_token.hash_password(password):
             return user.get("userGuid")
         else:
-            return None # Переделать на вывод ошибки.
+            print(f"Пользователя с таким {username} не существует.")
+            return None
 
     def registrate(self, username : str, password : str):
-        database = mongoDBClient.MongoDBClient(self.uri, self.db_name)
-
-        user_status = database.create_user("Users", username, password)
+        user_status = self.mongo_client.create_user("users", username, password)
 
         if user_status == False:
             print(f"Пользователь {username} уже существует.")

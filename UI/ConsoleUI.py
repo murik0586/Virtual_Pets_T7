@@ -1,12 +1,31 @@
+import mongoDBClient.mongoDBClient
+from authSystem.Authorization import Authorization
 from entity.PetManager import PetManager
 from UI.PetInteractionUI import PetInteractionUI
 import time
 
 class ConsoleUI:
-    def __init__(self, manager: PetManager):
+    def __init__(self, manager: PetManager, uri : str, db_name : str):
         self._manager = manager
+        self.auth = Authorization(uri, db_name)
 
     def run(self):
+        #Вывод окна авторизации.
+        while True:
+            self._show_authorization()
+            choice = input("Выберите действие: ")
+
+            match choice:
+                case "1":
+                    if self._authorization_ui() != None:
+                        break
+                case "2":
+                    self._registration_ui()
+                case "0":
+                    return
+                case _:
+                    print("Неверный ввод!")
+
         while True:
             self._show_main_menu()
             choice = input("Выберите действие: ")
@@ -24,6 +43,23 @@ class ConsoleUI:
                     return
                 case _:
                     print("Неверный ввод!")
+
+    def _show_authorization(self):
+        print ("\n=== Виртуальный питомец ===")
+        print("1. Авторизация")
+        print("2. Регистрация")
+        print("0. Выход")
+
+    def _authorization_ui(self) -> bool:
+        username = input("Введите логин: ")
+        password = input("Введите пароль: ")
+        return self.auth.authorize(username, password)
+
+    def _registration_ui(self):
+        username = input("Введите логин: ")
+        password = input("Введите пароль: ")
+        self.auth.registrate(username, password)
+
 
     def _show_main_menu(self):
 
