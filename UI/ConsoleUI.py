@@ -17,7 +17,7 @@ class ConsoleUI:
 
             match choice:
                 case "1":
-                    if self._authorization_ui() != None:
+                    if self._authorization_ui() is not None:
                         break
                 case "2":
                     self._registration_ui()
