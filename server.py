@@ -4,9 +4,11 @@ import json
 import urllib.parse
 from datetime import datetime
 import logging
+
+from authSystem.Authorization import Authorization
 from entity.Pet import Pet
 from entity.PetManager import PetManager
-from mongoDBClient.mongoDBClient import MongoDBClient
+from mongoDBClient import mongoDBClient
 
 # Настройка логирования
 logging.basicConfig(
@@ -16,18 +18,25 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class TamagotchiServer:
-    def __init__(self, mongo_client = None):
+    def __init__(self, mongo_client=None):
         self.pet_manager = PetManager()
         if mongo_client:
             self.mongo_client = mongo_client
         else:
-            self.mongo_client = MongoDBClient(
+            self.mongo_client = mongoDBClient.MongoDBClient(
                 uri="mongodb://localhost:27017/",
                 db_name="tamagotchi_db",
                 username="admin",
                 password="12345"
             )
+
+        # Создаем объект авторизации
+        self.auth = Authorization(
+            uri="mongodb://localhost:27017/",
+            db_name="tamagotchi_db"
+        )
 
         self._load_pets_from_db()
         self.httpd = None
@@ -88,7 +97,7 @@ class TamagotchiServer:
             def _set_cors_headers(self):
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.send_header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
-                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 
             def _set_headers(self, status_code=200, content_type='application/json'):
                 self.send_response(status_code)
@@ -101,8 +110,8 @@ class TamagotchiServer:
                 return [part for part in path.split('/')[1:] if part]
 
             def _get_pet_id(self, parts):
-                if len(parts) >= 2 and parts[1].isdigit():
-                    return int(parts[1])
+                if len(parts) >= 3 and parts[2].isdigit():  # Изменено с 2 на 3 из-за user_uuid в пути
+                    return int(parts[2])
                 return None
 
             def _read_json_body(self):
@@ -125,6 +134,11 @@ class TamagotchiServer:
             def _log_request(self):
                 logger.info(f"{self.client_address[0]} - {self.command} {self.path}")
 
+            def _verify_user(self, user_uuid):
+                """Проверяет существование пользователя по UUID"""
+                user = server.mongo_client.find_by_field("users", {"userGuid": user_uuid})
+                return user is not None
+
             def do_OPTIONS(self):
                 """Обработка CORS preflight запросов"""
                 self._log_request()
@@ -135,11 +149,24 @@ class TamagotchiServer:
                 self._log_request()
                 parts = self._parse_url()
 
-                if not parts or parts[0] != 'pets':
+                # Проверка авторизации для всех запросов, кроме auth
+                if not parts or parts[0] == 'auth':
                     return self._send_response({'error': 'Not found'}, 404)
 
-                if len(parts) == 1:
-                    # GET /pets - список питомцев
+                # Проверка наличия user_uuid в пути
+                if len(parts) < 2:
+                    return self._send_response({'error': 'Unauthorized'}, 401)
+
+                user_uuid = parts[0]
+                if not self._verify_user(user_uuid):
+                    return self._send_response({'error': 'Invalid user'}, 403)
+
+                # Теперь parts[1] - это 'pets'
+                if parts[1] != 'pets':
+                    return self._send_response({'error': 'Not found'}, 404)
+
+                if len(parts) == 2:
+                    # GET /{user_uuid}/pets - список питомцев пользователя
                     pets = [
                         {
                             'id': pid,
@@ -150,17 +177,26 @@ class TamagotchiServer:
                             'is_alive': pet.state.is_alive
                         }
                         for pid, pet in server.pet_manager.get_alive_pets().items()
+                        # Фильтруем питомцев по user_uuid
+                        if server.mongo_client.find_by_field("pets", {"pet_id": pid, "user_uuid": user_uuid})
                     ]
                     self._send_response(pets)
 
-                elif len(parts) == 2 and parts[1].isdigit():
-                    # GET /pets/{id}
-                    pet = server.pet_manager.get_pet(int(parts[1]))
+                elif len(parts) == 3 and parts[2].isdigit():
+                    # GET /{user_uuid}/pets/{id}
+                    pet_id = int(parts[2])
+
+                    # Проверяем, принадлежит ли питомец пользователю
+                    pet_data = server.mongo_client.find_by_field("pets", {"pet_id": pet_id})
+                    if not pet_data or pet_data.get("user_uuid") != user_uuid:
+                        return self._send_response({'error': 'Pet not found or not owned by user'}, 404)
+
+                    pet = server.pet_manager.get_pet(pet_id)
                     if not pet:
                         return self._send_response({'error': 'Pet not found'}, 404)
 
                     self._send_response({
-                        'id': int(parts[1]),
+                        'id': pet_id,
                         'name': pet.name,
                         'state': str(pet.state)
                     })
@@ -171,11 +207,48 @@ class TamagotchiServer:
                 self._log_request()
                 parts = self._parse_url()
 
-                if not parts or parts[0] != 'pets':
+                # Обработка запросов авторизации и регистрации
+                if parts and parts[0] == 'auth':
+                    data = self._read_json_body() or {}
+
+                    if len(parts) == 2 and parts[1] == 'login':
+                        # POST /auth/login
+                        if 'username' not in data or 'password' not in data:
+                            return self._send_response({'error': 'Username and password required'}, 400)
+
+                        user_uuid = server.auth.authorize(data['username'], data['password'])
+                        if user_uuid:
+                            return self._send_response({'user_uuid': user_uuid})
+                        else:
+                            return self._send_response({'error': 'Invalid credentials'}, 401)
+
+                    elif len(parts) == 2 and parts[1] == 'register':
+                        # POST /auth/register
+                        if 'username' not in data or 'password' not in data:
+                            return self._send_response({'error': 'Username and password required'}, 400)
+
+                        if server.auth.registrate(data['username'], data['password']):
+                            return self._send_response({'success': True, 'message': 'User registered successfully'})
+                        else:
+                            return self._send_response({'error': 'Username already exists'}, 400)
+
+                    else:
+                        return self._send_response({'error': 'Not found'}, 404)
+
+                # Для всех остальных запросов требуется авторизация
+                if not parts or len(parts) < 2:
+                    return self._send_response({'error': 'Unauthorized'}, 401)
+
+                user_uuid = parts[0]
+                if not self._verify_user(user_uuid):
+                    return self._send_response({'error': 'Invalid user'}, 403)
+
+                # Теперь parts[1] - это 'pets'
+                if parts[1] != 'pets':
                     return self._send_response({'error': 'Not found'}, 404)
 
-                if len(parts) == 1:
-                    # POST /pets - создание питомца
+                if len(parts) == 2:
+                    # POST /{user_uuid}/pets - создание питомца
                     data = self._read_json_body() or {}
 
                     if 'name' not in data:
@@ -189,7 +262,7 @@ class TamagotchiServer:
 
                     pet_id = server.pet_manager.create_pet(name, health)
 
-                    # Сохраняем питомца в MongoDB
+                    # Сохраняем питомца в MongoDB с user_uuid
                     server.mongo_client.insert_one("pets", {
                         "pet_id": pet_id,
                         "name": name,
@@ -198,13 +271,14 @@ class TamagotchiServer:
                         "hunger": 5,
                         "is_alive": True,
                         "created_at": datetime.now().isoformat(),
-                        "last_updated": datetime.now().isoformat()
+                        "last_updated": datetime.now().isoformat(),
+                        "user_uuid": user_uuid
                     })
 
                     self._send_response({'id': pet_id}, 201)
 
-                elif len(parts) == 3 and parts[1].isdigit():
-                    # POST /pets/{id}/{action}
+                elif len(parts) == 4 and parts[2].isdigit():
+                    # POST /{user_uuid}/pets/{id}/{action}
                     actions = {
                         'feed': 'feed',
                         'stroke': 'stroke',
@@ -213,11 +287,17 @@ class TamagotchiServer:
                         'ignore': 'ignore'
                     }
 
-                    action = actions.get(parts[2])
+                    action = actions.get(parts[3])
                     if not action:
                         return self._send_response({'error': 'Invalid action'}, 400)
 
-                    pet_id = int(parts[1])
+                    pet_id = int(parts[2])
+
+                    # Проверяем, принадлежит ли питомец пользователю
+                    pet_data = server.mongo_client.find_by_field("pets", {"pet_id": pet_id})
+                    if not pet_data or pet_data.get("user_uuid") != user_uuid:
+                        return self._send_response({'error': 'Pet not found or not owned by user'}, 404)
+
                     pet = server.pet_manager.get_pet(pet_id)
                     if not pet:
                         return self._send_response({'error': 'Pet not found'}, 404)
@@ -243,7 +323,7 @@ class TamagotchiServer:
 
                     self._send_response({
                         'id': pet_id,
-                        'action': parts[2],
+                        'action': parts[3],
                         'state': str(pet.state)
                     })
                 else:
@@ -253,10 +333,21 @@ class TamagotchiServer:
                 self._log_request()
                 parts = self._parse_url()
 
-                if not parts or parts[0] != 'pets' or len(parts) != 2 or not parts[1].isdigit():
+                # Проверка авторизации
+                if not parts or len(parts) < 3 or parts[1] != 'pets' or not parts[2].isdigit():
                     return self._send_response({'error': 'Not found'}, 404)
 
-                pet_id = int(parts[1])
+                user_uuid = parts[0]
+                if not self._verify_user(user_uuid):
+                    return self._send_response({'error': 'Invalid user'}, 403)
+
+                pet_id = int(parts[2])
+
+                # Проверяем, принадлежит ли питомец пользователю
+                pet_data = server.mongo_client.find_by_field("pets", {"pet_id": pet_id})
+                if not pet_data or pet_data.get("user_uuid") != user_uuid:
+                    return self._send_response({'error': 'Pet not found or not owned by user'}, 404)
+
                 if server.pet_manager.remove_pet(pet_id):
                     # Помечаем питомца как удалённого в MongoDB
                     server.mongo_client.update_one(

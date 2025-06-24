@@ -1,16 +1,82 @@
 openapi: 3.0.0
 info:
   title: Tamagotchi API
-  description: API для управления виртуальными питомцами
-  version: 1.0.0
+  description: API для управления виртуальными питомцами с авторизацией пользователей
+  version: 1.1.0
 servers:
   - url: http://localhost:8000
     description: Локальный сервер
 
 paths:
-  /pets:
+  /auth/register:
+    post:
+      summary: Регистрация нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "User registered successfully"
+        '400':
+          description: Ошибка регистрации (например, пользователь уже существует)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      summary: Авторизация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Успешная авторизация
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_uuid:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+        '401':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /{userUuid}/pets:
     get:
-      summary: Получить список живых питомцев
+      summary: Получить список живых питомцев пользователя
+      parameters:
+        - name: userUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: UUID пользователя
       responses:
         '200':
           description: Успешный запрос
@@ -20,8 +86,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Pet'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Доступ запрещен (неверный UUID пользователя)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
-      summary: Создать нового питомца
+      summary: Создать нового питомца для пользователя
+      parameters:
+        - name: userUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: UUID пользователя
       requestBody:
         required: true
         content:
@@ -39,11 +125,36 @@ paths:
                   id:
                     type: integer
                     description: ID созданного питомца
+        '400':
+          description: Неверные данные для создания питомца
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Доступ запрещен (неверный UUID пользователя)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
-  /pets/{petId}:
+  /{userUuid}/pets/{petId}:
     get:
-      summary: Получить информацию о питомце
+      summary: Получить информацию о питомце пользователя
       parameters:
+        - name: userUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: UUID пользователя
         - name: petId
           in: path
           required: true
@@ -56,11 +167,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Pet'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Доступ запрещен (неверный UUID пользователя)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Питомец не найден
+          description: Питомец не найден или не принадлежит пользователю
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
-      summary: Удалить питомца
+      summary: Удалить питомца пользователя
       parameters:
+        - name: userUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: UUID пользователя
         - name: petId
           in: path
           required: true
@@ -69,13 +203,36 @@ paths:
       responses:
         '204':
           description: Питомец удален
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Доступ запрещен (неверный UUID пользователя)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Питомец не найден
+          description: Питомец не найден или не принадлежит пользователю
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
-  /pets/{petId}/{action}:
+  /{userUuid}/pets/{petId}/{action}:
     post:
-      summary: Выполнить действие с питомцем
+      summary: Выполнить действие с питомцем пользователя
       parameters:
+        - name: userUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: UUID пользователя
         - name: petId
           in: path
           required: true
@@ -93,14 +250,57 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pet'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  action:
+                    type: string
+                  state:
+                    type: string
         '400':
           description: Неверное действие или питомец мертв
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Доступ запрещен (неверный UUID пользователя)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Питомец не найден
+          description: Питомец не найден или не принадлежит пользователю
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
+    UserCredentials:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          example: "user123"
+        password:
+          type: string
+          minLength: 6
+          format: password
+          example: "password123"
+
     Pet:
       type: object
       properties:
@@ -116,6 +316,10 @@ components:
           type: integer
         is_alive:
           type: boolean
+        state:
+          type: string
+          description: Текстовое представление состояния питомца
+
     NewPet:
       type: object
       required:
@@ -124,7 +328,17 @@ components:
         name:
           type: string
           minLength: 3
+          example: "Fluffy"
         health:
           type: integer
           minimum: 1
           default: 5
+          example: 5
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Описание ошибки
+          example: "Pet not found or not owned by user"
