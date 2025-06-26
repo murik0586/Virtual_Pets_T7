@@ -81,7 +81,7 @@ class ConsoleUI:
         print(f"Создан питомец {name} с ID {pet_id}")
 
     def _manage_pet(self):
-        pet = self._select_pet()
+        pet_id,pet = self._select_pet()
         if pet:
             PetInteractionUI(pet).run()
 

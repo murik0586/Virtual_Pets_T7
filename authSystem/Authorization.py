@@ -30,7 +30,7 @@ class Authorization:
     def registrate(self, username : str, password : str):
         user_status = self.mongo_client.create_user("users", username, password)
 
-        if user_status == False:
+        if not user_status:
             print(f"Пользователь {username} уже существует.")
             return False
 
